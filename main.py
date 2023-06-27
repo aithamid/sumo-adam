@@ -1,5 +1,6 @@
 from sumolib import checkBinary
 import traci
+import time
 
 sumoBinary = checkBinary('sumo-gui')
 
@@ -21,6 +22,10 @@ def main():
             speed = traci.vehicle.getSpeed(vehId)
             print("Position ID[{}] : ({}, {})".format(vehId,x, y))
             print("Speed ID[{}] : {} m/s".format(vehId, speed))
+            lon,lat = traci.simulation.convertGeo(x,y)
+            print("Longitude:", lon)
+            print("Latitude:", lat)
+
         traci.simulationStep()
     traci.close()
 
