@@ -17,8 +17,10 @@ def main():
             avoidEdge(vehId, EDGE_ID)
         for vehId in traci.vehicle.getIDList():
             position = traci.vehicle.getPosition(vehId)
-            print("vehicule",vehId,  position[0], position[1],"\n"
-                  )
+            x, y = traci.vehicle.getPosition(vehId)
+            speed = traci.vehicle.getSpeed(vehId)
+            print("Position ID[{}] : ({}, {})".format(vehId,x, y))
+            print("Speed ID[{}] : {} m/s".format(vehId, speed))
         traci.simulationStep()
     traci.close()
 
