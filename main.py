@@ -20,9 +20,11 @@ def main():
             position = traci.vehicle.getPosition(vehId)
             x, y = traci.vehicle.getPosition(vehId)
             speed = traci.vehicle.getSpeed(vehId)
+            lon,lat = traci.simulation.convertGeo(x,y)
+            co2_emission = traci.vehicle.getCO2Emission(vehId)
+            print("CO2 Emission:", co2_emission)
             print("Position ID[{}] : ({}, {})".format(vehId,x, y))
             print("Speed ID[{}] : {} m/s".format(vehId, speed))
-            lon,lat = traci.simulation.convertGeo(x,y)
             print("Longitude:", lon)
             print("Latitude:", lat)
 
