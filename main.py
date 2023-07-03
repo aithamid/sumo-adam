@@ -18,6 +18,9 @@ bucket = "db"
 def main():
     isInsert = False
     startSim()
+
+    simu_id = 2
+
     i = 0
     client = InfluxDBClient(url=url, token=token)
     while shouldContinueSim():
@@ -36,18 +39,18 @@ def main():
                 print("Speed ID[{}] : {} m/s".format(vehId, speed))
                 print("Longitude:", lon)
                 print("Latitude:", lat)
-                insertDB(client, vehId, i, lon, lat, co2_emission, speed)
+                insertDB(client, vehId, i, lon, lat, co2_emission, speed, simu_id)
         i = i + 1
         print(i)
         traci.simulationStep()
     traci.close()
 
 
-def insertDB(client, vehId, i, lon, lat, co2_emission, speed):
+def insertDB(client, vehId, i, lon, lat, co2_emission, speed, simu_id):
     # Create a new data point with tags
     data_point = Point("sumo") \
         .tag("vehicle_id", vehId) \
-        .tag("simu_id", "1") \
+        .tag("simu_id", simu_id) \
         .field("iteration_id", int(i/1000)) \
         .field("longitude", lon) \
         .field("latitude", lat) \
