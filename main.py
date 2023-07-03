@@ -1,5 +1,7 @@
 from sumolib import checkBinary
 import traci
+from influxdb_client import InfluxDBClient, Point
+from datetime import datetime
 import time
 
 sumoBinary = checkBinary('sumo-gui')
@@ -7,10 +9,15 @@ sumoBinary = checkBinary('sumo-gui')
 WHITE = [255, 255, 255]
 EDGE_ID = 'closed'
 VEHICLES = ['1', '4', '8']
+token = "hHSXQ4ARF4YYcQcDHaqZWZzjtGerYEmj0PK_yaV03yHcuiCP9o01MOdU2MrU36YUMrTcsOnG5QWIpfyF1AJ98g=="
+org = "ERENA"
+url = "http://localhost:8086"
+bucket = "db"
 
 
 def main():
     startSim()
+    i = 0
 
     while shouldContinueSim():
         for vehId in getOurDeparted(VEHICLES):
@@ -27,7 +34,24 @@ def main():
             print("Speed ID[{}] : {} m/s".format(vehId, speed))
             print("Longitude:", lon)
             print("Latitude:", lat)
+            client = InfluxDBClient(url=url, token=token)
 
+            # Create a new data point with tags
+            data_point = Point("sumo") \
+                .tag("vehicle_id", vehId) \
+                .tag("simu_id", "1") \
+                .tag("iteration_id", i) \
+                .field("value", 25.5) \
+                .field("longitude", lon) \
+                .field("latitude", lat) \
+                .field("co2", co2_emission) \
+                .field("speed", speed) \
+                .time(datetime.utcnow())
+
+            # Write the data point to InfluxDB
+            client.write_api().write(bucket=bucket, org=org, record=data_point)
+        i = i + 1
+        print(i)
         traci.simulationStep()
     traci.close()
 
