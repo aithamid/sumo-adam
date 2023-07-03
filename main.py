@@ -18,7 +18,7 @@ bucket = "db"
 def main():
     startSim()
     i = 0
-
+    client = InfluxDBClient(url=url, token=token)
     while shouldContinueSim():
         for vehId in getOurDeparted(VEHICLES):
             setVehColor(vehId, WHITE)
@@ -34,27 +34,28 @@ def main():
             print("Speed ID[{}] : {} m/s".format(vehId, speed))
             print("Longitude:", lon)
             print("Latitude:", lat)
-            client = InfluxDBClient(url=url, token=token)
-
-            # Create a new data point with tags
-            data_point = Point("sumo") \
-                .tag("vehicle_id", vehId) \
-                .tag("simu_id", "1") \
-                .tag("iteration_id", i) \
-                .field("value", 25.5) \
-                .field("longitude", lon) \
-                .field("latitude", lat) \
-                .field("co2", co2_emission) \
-                .field("speed", speed) \
-                .time(datetime.utcnow())
-
-            # Write the data point to InfluxDB
-            client.write_api().write(bucket=bucket, org=org, record=data_point)
+            insertDB(client, vehId, i, lon, lat, co2_emission, speed)
         i = i + 1
         print(i)
         traci.simulationStep()
     traci.close()
 
+
+def insertDB(client, vehId, i, lon, lat, co2_emission, speed):
+    # Create a new data point with tags
+    data_point = Point("sumo") \
+        .tag("vehicle_id", vehId) \
+        .tag("simu_id", "1") \
+        .tag("iteration_id", i) \
+        .field("value", 25.5) \
+        .field("longitude", lon) \
+        .field("latitude", lat) \
+        .field("co2", co2_emission) \
+        .field("speed", speed) \
+        .time(datetime.utcnow())
+
+    # Write the data point to InfluxDB
+    client.write_api().write(bucket=bucket, org=org, record=data_point)
 
 def startSim():
     """Starts the simulation."""
