@@ -9,32 +9,34 @@ sumoBinary = checkBinary('sumo-gui')
 WHITE = [255, 255, 255]
 EDGE_ID = 'closed'
 VEHICLES = ['1', '4', '8']
-token = "hHSXQ4ARF4YYcQcDHaqZWZzjtGerYEmj0PK_yaV03yHcuiCP9o01MOdU2MrU36YUMrTcsOnG5QWIpfyF1AJ98g=="
+token = "I5Iyui0V6B-MLOX9Hm_GlcvC7ZqJVTMDF04fqfFsgDQjniavDldsZ4jhtfBOKKwi1l4ACjBarQXvDEFrYYZ6CQ=="
 org = "ERENA"
 url = "http://localhost:8086"
 bucket = "db"
 
 
 def main():
+    isInsert = False
     startSim()
     i = 0
     client = InfluxDBClient(url=url, token=token)
     while shouldContinueSim():
+
         for vehId in getOurDeparted(VEHICLES):
             setVehColor(vehId, WHITE)
             avoidEdge(vehId, EDGE_ID)
         for vehId in traci.vehicle.getIDList():
-            position = traci.vehicle.getPosition(vehId)
-            x, y = traci.vehicle.getPosition(vehId)
-            speed = traci.vehicle.getSpeed(vehId)
-            lon,lat = traci.simulation.convertGeo(x,y)
-            co2_emission = traci.vehicle.getCO2Emission(vehId)
-            print("CO2 Emission:", co2_emission)
-            print("Position ID[{}] : ({}, {})".format(vehId,x, y))
-            print("Speed ID[{}] : {} m/s".format(vehId, speed))
-            print("Longitude:", lon)
-            print("Latitude:", lat)
-            insertDB(client, vehId, i, lon, lat, co2_emission, speed)
+            if (i%1000 == 0):
+                x, y = traci.vehicle.getPosition(vehId)
+                speed = traci.vehicle.getSpeed(vehId)
+                lon, lat = traci.simulation.convertGeo(x, y)
+                co2_emission = traci.vehicle.getCO2Emission(vehId)
+                print("CO2 Emission:", co2_emission)
+                print("Position ID[{}] : ({}, {})".format(vehId, x, y))
+                print("Speed ID[{}] : {} m/s".format(vehId, speed))
+                print("Longitude:", lon)
+                print("Latitude:", lat)
+                insertDB(client, vehId, i, lon, lat, co2_emission, speed)
         i = i + 1
         print(i)
         traci.simulationStep()
@@ -46,8 +48,7 @@ def insertDB(client, vehId, i, lon, lat, co2_emission, speed):
     data_point = Point("sumo") \
         .tag("vehicle_id", vehId) \
         .tag("simu_id", "1") \
-        .tag("iteration_id", i) \
-        .field("value", 25.5) \
+        .field("iteration_id", int(i/1000)) \
         .field("longitude", lon) \
         .field("latitude", lat) \
         .field("co2", co2_emission) \
