@@ -3,7 +3,7 @@ import requests
 # Set up the API endpoint URL
 url = "http://localhost:8086/query"
 
-# Set up the query parameters
+# Set up the myquery parameters
 params = {
     "db": "db",
     "q": "SELECT * FROM sumo"

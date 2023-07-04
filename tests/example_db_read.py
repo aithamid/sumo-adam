@@ -13,11 +13,11 @@ def main():
     # Create the InfluxDB client
     client = InfluxDBClient(url=url, token=token, org=org)
 
-    # # Create the query
-    # query = f'from(bucket:"{bucket}") |> range(start: -7d) |> filter(fn: (r) => r["_measurement"] == "measurement1")'
+    # # Create the myquery
+    # myquery = f'from(bucket:"{bucket}") |> range(start: -7d) |> filter(fn: (r) => r["_measurement"] == "measurement1")'
     #
-    # # Execute the query
-    # result = client.query_api().query(query)
+    # # Execute the myquery
+    # result = client.query_api().myquery(myquery)
     #
     # # Process the results
     # for table in result:
@@ -29,10 +29,10 @@ def main():
     #         break
     #
 
-    # Modify the query to retrieve the latest value
+    # Modify the myquery to retrieve the latest value
     query = f'from(bucket:"{bucket}") |> range(start: -7d) |> filter(fn: (r) => r["_measurement"] == "measurement1") |> last()'
 
-    # Execute the modified query
+    # Execute the modified myquery
     result = client.query_api().query(query)
 
     # Process the result

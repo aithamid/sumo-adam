@@ -3,9 +3,12 @@ import traci
 from influxdb_client import InfluxDBClient, Point
 from datetime import datetime
 import time
+import json
+import sys
+from myquery.getjson import getLastSimuId, getLastAll
 
 sumoBinary = checkBinary('sumo-gui')
-
+freq = 300
 WHITE = [255, 255, 255]
 EDGE_ID = 'closed'
 VEHICLES = ['1', '4', '8']
@@ -19,7 +22,9 @@ def main():
     isInsert = False
     startSim()
 
-    simu_id = 2
+    # simu_id = 1
+    simu_id = getLastSimuId() + 1
+
 
     i = 0
     client = InfluxDBClient(url=url, token=token)
@@ -29,7 +34,7 @@ def main():
             setVehColor(vehId, WHITE)
             avoidEdge(vehId, EDGE_ID)
         for vehId in traci.vehicle.getIDList():
-            if (i%1000 == 0):
+            if (i%freq == 0):
                 x, y = traci.vehicle.getPosition(vehId)
                 speed = traci.vehicle.getSpeed(vehId)
                 lon, lat = traci.simulation.convertGeo(x, y)
@@ -50,8 +55,8 @@ def insertDB(client, vehId, i, lon, lat, co2_emission, speed, simu_id):
     # Create a new data point with tags
     data_point = Point("sumo") \
         .tag("vehicle_id", vehId) \
-        .tag("simu_id", simu_id) \
-        .field("iteration_id", int(i/1000)) \
+        .field("simu_id", simu_id) \
+        .field("iteration_id", int(i/freq)) \
         .field("longitude", lon) \
         .field("latitude", lat) \
         .field("co2", co2_emission) \
