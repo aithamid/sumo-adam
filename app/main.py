@@ -1,11 +1,10 @@
+import os
+import requests
 from sumolib import checkBinary
 import traci
 from influxdb_client import InfluxDBClient, Point
 from datetime import datetime
-import time
-import json
-import sys
-from myquery.getjson import getLastSimuId, getLastAll
+from getjson import getLastSimuId
 
 sumoBinary = checkBinary('sumo-gui')
 freq = 300
@@ -14,17 +13,15 @@ EDGE_ID = 'closed'
 VEHICLES = ['1', '4', '8']
 token = "I5Iyui0V6B-MLOX9Hm_GlcvC7ZqJVTMDF04fqfFsgDQjniavDldsZ4jhtfBOKKwi1l4ACjBarQXvDEFrYYZ6CQ=="
 org = "ERENA"
-url = "http://localhost:8086"
+url = "http://influxdb:8086"
 bucket = "db"
 
 
 def main():
-    isInsert = False
     startSim()
 
     # simu_id = 1
     simu_id = getLastSimuId() + 1
-
 
     i = 0
     client = InfluxDBClient(url=url, token=token)
@@ -34,7 +31,7 @@ def main():
             setVehColor(vehId, WHITE)
             avoidEdge(vehId, EDGE_ID)
         for vehId in traci.vehicle.getIDList():
-            if (i%freq == 0):
+            if i % freq == 0:
                 x, y = traci.vehicle.getPosition(vehId)
                 speed = traci.vehicle.getSpeed(vehId)
                 lon, lat = traci.simulation.convertGeo(x, y)
@@ -56,7 +53,7 @@ def insertDB(client, vehId, i, lon, lat, co2_emission, speed, simu_id):
     data_point = Point("sumo") \
         .tag("vehicle_id", vehId) \
         .field("simu_id", simu_id) \
-        .field("iteration_id", int(i/freq)) \
+        .field("iteration_id", int(i / freq)) \
         .field("longitude", lon) \
         .field("latitude", lat) \
         .field("co2", co2_emission) \
@@ -66,16 +63,18 @@ def insertDB(client, vehId, i, lon, lat, co2_emission, speed, simu_id):
     # Write the data point to InfluxDB
     client.write_api().write(bucket=bucket, org=org, record=data_point)
 
+
 def startSim():
     """Starts the simulation."""
     traci.start(
         [
             sumoBinary,
-            '-c', 'network/network.sumocfg',
+            '-c', 'sumo/sumo.cfg',
             '--delay', '200',
             '--start'
+        ]
+    )
 
-        ])
 
 
 def shouldContinueSim():
