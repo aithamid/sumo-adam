@@ -69,7 +69,7 @@ def startSim():
     traci.start(
         [
             sumoBinary,
-            '-c', 'sumo/sumo.cfg',
+            '-c', '../sumo/sumo.cfg',
             '--delay', '200',
             '--start'
         ]
