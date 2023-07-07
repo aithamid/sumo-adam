@@ -1,59 +1,18 @@
-import threading
-import random
-
 import traci
-from sumolib import checkBinary
-
-sumoBinary = checkBinary('sumo-gui')
-
-
-class Vehicle:
-    number_vehicles = 0
-
-    def __init__(self):
-        pass
-
-
-class Simulation:
-    def __init__(self, c_delay):
-        self.delay = c_delay
-        print("Simulation created")
-        traci.start(
-            [
-                sumoBinary,
-                '-c', '../sumo/sumo.cfg',
-                '--delay', str(self.delay),
-                '--start'
-            ]
-        )
-        my_thread = threading.Thread(target=self.start)
-        my_thread.start()
-
-    def start(self):
-        while traci.simulation.getMinExpectedNumber() > 0:
-            traci.simulationStep()
-        traci.close()
-
-    def update(self):
-        pass
-
-    def insert(self):
-        pass
-
-    def addVehicle(self, vehicle):
-        pass
-
-    def removeVehicle(self, vehicle):
-        pass
-
+import random
+from launcher import Launcher
+from updatedb import UpdateDB
 
 def main():
-    new_simulation = Simulation(200)
+    new_simulation = Launcher(200) # delay en parametre en ms
+    UpdateDB(1000) # insertion information des véhicules dans influxdb
+
+
     # vehicle_test = Vehicle(1, "U6", "car")
     depart_time = traci.simulation.getTime()
     routelist = traci.route.getIDList()
-    randomroute = random.choice(routelist)
-    print(randomroute)
+    r_route = random.choice(routelist)
+    print(r_route)
 
 
 if __name__ == "__main__":
