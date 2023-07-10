@@ -1,19 +1,19 @@
 version: '3'
 services:
-  sumo-traci-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./sumo:/app/sumo
-    ports:
-      - "1234:1234"  # Replace with the desired port mapping
-    environment:
-      - TRACI_PORT=1234  # Set the TraCI port to match the port mapping
-      - DISPLAY=host.docker.internal:0.0
-    depends_on:
-      - influxdb
+#  sumo-traci-app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    volumes:
+#      - /tmp/.X11-unix:/tmp/.X11-unix
+#      - ./sumo:/app/sumo
+#    ports:
+#      - "1234:1234"  # Replace with the desired port mapping
+#    environment:
+#      - TRACI_PORT=1234  # Set the TraCI port to match the port mapping
+#      - DISPLAY=host.docker.internal:0.0
+#    depends_on:
+#      - influxdb
 
   influxdb:
     image: influxdb

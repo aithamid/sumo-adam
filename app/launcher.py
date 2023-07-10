@@ -2,6 +2,7 @@ import threading
 import random
 
 import traci
+from influxdb_client import InfluxDBClient
 from sumolib import checkBinary
 
 sumoBinary = checkBinary('sumo-gui')
@@ -16,6 +17,9 @@ class Vehicle:
 
 class Launcher:
     def __init__(self, c_delay):
+        with InfluxDBClient.from_config_file("creds.toml") as self.client:
+            self.query_api = self.client.query_api()
+            self.write_api = self.client.write_api()
         self.delay = c_delay
         print("Simulation created")
         traci.start(
@@ -32,10 +36,24 @@ class Launcher:
     def start(self):
         while traci.simulation.getMinExpectedNumber() > 0:
             traci.simulationStep()
+            self.check_too_add()
         traci.close()
 
     def update(self):
         pass
+
+    def check_too_add(self):
+        result = self.query_api.query("""
+                                from(bucket: "db")
+  |> range(start: 0)
+  |> filter(fn: (r) => r["_measurement"] == "toadd")
+  |> filter(fn: (r) => r["_field"] == "vehicle_id")
+  |> yield(name: "mean")
+                    """)
+        if len(result) == 0:
+            myjson = result.to_json()
+            print(myjson)
+
 
     def insert(self):
         pass
