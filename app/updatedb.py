@@ -20,7 +20,6 @@ class UpdateDB:
     def update(self):
         self.i = 1
         while traci.simulation.getMinExpectedNumber() > 0:
-            print("ça marche")
             self.insertDB()
             time.sleep(self.delay / 1000)
         traci.close()

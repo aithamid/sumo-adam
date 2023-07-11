@@ -47,7 +47,12 @@ class SumoAPI:
             .field("vehicle_id", vehicle) \
             .time(datetime.utcnow())
         self.write_api.write(bucket="db", record=data_point)
-        print("OK")
+
+    def remove_car(self, vehicle):
+        data_point = Point("toremove") \
+            .field("vehicle_id", vehicle) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
 
     def get_cars_list(self):
         pass
@@ -68,10 +73,16 @@ def get_car(vehicle):
     return car
 
 
-@sumo_api.app.route('/cars/<vehicle>', methods=['POST'])
+@sumo_api.app.route('/cars/<vehicle>/add', methods=['POST'])
 def add_car(vehicle):
     sumo_api.add_car(vehicle)
     return f"Car {vehicle} added"
+
+
+@sumo_api.app.route('/cars/<vehicle>/remove', methods=['DELETE'])
+def remove_car(vehicle):
+    sumo_api.remove_car(vehicle)
+    return f"Car {vehicle} removed"
 
 
 if __name__ == '__main__':

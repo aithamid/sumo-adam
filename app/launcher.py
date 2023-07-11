@@ -20,6 +20,7 @@ class Launcher:
         with InfluxDBClient.from_config_file("creds.toml") as self.client:
             self.query_api = self.client.query_api()
             self.write_api = self.client.write_api()
+            self.delete_api = self.client.delete_api()
         self.delay = c_delay
         print("Simulation created")
         traci.start(
