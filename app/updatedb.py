@@ -2,6 +2,7 @@ import threading
 import time
 from datetime import datetime
 
+import self as self
 import traci
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -21,6 +22,7 @@ class UpdateDB:
         self.i = 1
         while traci.simulation.getMinExpectedNumber() > 0:
             self.insertDB()
+            self.insertvehicles()
             time.sleep(self.delay / 1000)
         traci.close()
 
@@ -39,3 +41,10 @@ class UpdateDB:
                 .time(datetime.utcnow())
             self.write_api.write(bucket="db", record=data_point)
         self.i += 1
+
+    def insertvehicles(self):
+        data_point = Point("vehicles") \
+            .tag("vehlist", str(traci.vehicle.getIDList())) \
+            .field("test", 0) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
