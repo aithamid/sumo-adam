@@ -12,7 +12,7 @@ class SumoAPI:
         self.app = Flask(__name__)
         self.app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
         self.list = None
-        with InfluxDBClient.from_config_file("../app/creds.toml") as self.client:
+        with InfluxDBClient.from_config_file("creds.toml") as self.client:
             self.query_api = self.client.query_api()
             self.write_api = self.client.write_api()
 
