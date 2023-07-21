@@ -1,119 +1,71 @@
-# ADAM - API for Data-driven Autonomous Mobility
-
-ADAM is an API (Application Programming Interface) designed for Data-driven Autonomous Mobility. It provides a platform for integrating data-driven solutions into autonomous vehicles. This README file provides an overview of the ADAM project, its structure, and instructions on how to launch and use the API using SUMO and Docker Compose.
-
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-  - [Using Docker Compose](#using-docker-compose)
-  - [Without Docker Compose](#without-docker-compose)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Introduction
 
-ADAM aims to facilitate the integration of data-driven algorithms and models into autonomous vehicles. It provides a robust and flexible API that enables developers to interact with autonomous systems, retrieve vehicle data, and execute various operations related to autonomous mobility.
+Welcome to ADAM - API for Data-driven Autonomous Mobility!
 
-## Features
+The primary objective of this project is to create a REST API that facilitates data retrieval for each vehicle. ADAM has been developed to support the NOMA Project at the Gustave Eiffel University laboratory ERENA. The API is designed to provide essential functionalities required for our research and is implemented primarily in Python due to its popularity and suitability for research applications. For seamless execution, the project is containerized using Docker-compose, ensuring a smooth deployment process while mitigating potential library conflicts.
 
-- Access vehicle data: Retrieve data from sensors, GPS, accelerometers, etc.
-- Execute autonomous operations: Control vehicle movements, navigate routes, etc.
-- Data-driven algorithms integration: Incorporate machine learning models, AI algorithms, etc.
-- Real-time updates: Receive live data updates from vehicles.
-- Logging and analytics: Capture and analyze vehicle data for further insights.
+## Architecture
 
-## Installation
+The ADAM project consists of four main components:
 
-### Using Docker Compose
+1. **InfluxDB Container**: This container houses the database where vehicle data is stored.
+2. **Sumo Container**: This container manages the Sumo simulation environment, which includes tasks like launching Sumo, editing scenarios by adding or removing vehicles, and updating the database with relevant information.
+3. **API Container**: The core of ADAM, this container hosts the REST API developed using Flask. It enables users to interact with the data and perform various operations.
+4. **Client**: The client interacts with the API, and for this purpose, Postman is used to facilitate testing and validation.
 
-To install and set up the ADAM API with SUMO using Docker Compose, follow these steps:
+## Running the Project
 
-1. Clone the ADAM repository from GitHub:
+To run the ADAM project, follow these steps:
 
-   ```shell
-   git clone https://github.com/username/ADAM.git
-   ```
+1. Build the containers using the command: `docker-compose build`.
+2. Start the containers using: `docker-compose up`.
+3. Once the containers are up and running, you can access the API through Postman by navigating to [http://localhost:5000](http://localhost:5000/).
 
-2. Change to the project directory:
+## Documentation
 
-   ```shell
-   cd ADAM
-   ```
+### Sumo
 
-3. Update the necessary configurations in the `docker-compose.yml` file, such as ports, volumes, etc.
+The main program [`main.py`](http://main.py) orchestrates three essential classes:
 
-4. Build and launch the ADAM API with SUMO using Docker Compose:
+- `Launcher` from `launcher.py`: Responsible for launching Sumo simulation with a specified configuration delay.
+- `UpdateDB` from `updatedb.py`: Handles the updating of the InfluxDB with vehicle data at a configurable delay.
+- `Editor` from `editor.py`: Manages scenario editing, including adding and removing vehicles in the simulation at a configurable delay.
 
-   ```shell
-   docker-compose up -d
-   ```
+Each function call within the program creates a thread to ensure efficient and concurrent execution.
 
-   The API will be accessible at `http://localhost:5000`.
+```python
+def main():
+    Launcher(200)  
+    UpdateDB(1000) 
+    Editor(1000)
+```
 
-### Without Docker Compose
+### API
 
-To install and set up the ADAM API without using Docker Compose, follow these steps:
+The API is developed using Flask and provides the following endpoints:
 
-1. Clone the ADAM repository from GitHub:
+- **GET /cars**: Retrieves all information about the vehicles currently on the road.
+- **GET /cars/list**: Retrieves a list of vehicle names currently on the road.
+- **GET /cars/<vehicle>**: Retrieves detailed information about a specific vehicle.
+- **POST /cars/<vehicle>/add**: Adds a new vehicle to the simulation.
+- **DELETE /cars/<vehicle>/remove**: Removes a vehicle from the simulation.
 
-   ```shell
-   git clone https://github.com/username/ADAM.git
-   ```
+### Postman
 
-2. Change to the project directory:
+For ease of testing, the following endpoints are available in Postman:
 
-   ```shell
-   cd ADAM
-   ```
+#### GET
 
-3. Install the required dependencies:
+- [http://localhost:5000/cars](http://localhost:5000/cars): To get all the information about the vehicles on the road.
+- [http://localhost:5000/cars/list](http://localhost:5000/cars/list): To get the list of vehicles on the road (only the names of the vehicles).
+- [http://localhost:5000/cars/nameofvehicle](http://localhost:5000/cars/nameofvehicle): To get all the information about a specific vehicle.
 
-   ```shell
-   pip install -r requirements.txt
-   ```
+#### POST
 
-4. Install SUMO (Simulation of Urban MObility) following the official SUMO installation instructions for your operating system.
+- [http://localhost:5000/cars/nameofvehicle/add](http://localhost:5000/cars/nameofvehicle/add): To add a new vehicle to the simulation.
 
-5. Launch SUMO and import the necessary road network and simulation files.
+#### DELETE
 
-6. Configure the API settings, such as SUMO connection details and database connection details, in the `config.py` file.
+- [http://localhost:5000/cars/nameofvehicle/remove](http://localhost:5000/cars/nameofvehicle/remove): To remove a vehicle from the simulation.
 
-7. Launch the ADAM API:
-
-   ```shell
-   python app.py
-   ```
-
-   The API will be accessible at `http://localhost:5000`.
-
-## Usage
-
-To use the ADAM API, you can interact with its various endpoints using HTTP requests. You can integrate the API into your own applications or use tools like Postman to test and explore the available endpoints.
-
-Ensure that the ADAM API and SUMO are running before making requests.
-
-## API Endpoints
-
-The ADAM API exposes the following endpoints:
-
-- `GET /vehicles`: Retrieve data for all vehicles.
-- `GET /vehicles/{id}`: Retrieve data for a specific vehicle.
-- `POST /vehicles`: Add a new vehicle to the system.
-- `PUT /vehicles/{id}`: Update the information of a specific vehicle.
-- `DELETE /vehicles/{id}`: Remove a vehicle from the system.
-
-Please refer to the API documentation or the source code for more details on the available endpoints, their request/response formats, and any additional parameters.
-
-## Contributing
-
-Contributions to the ADAM project are welcome! If you encounter any issues, have suggestions for improvements, or would like to contribute new features, please open an issue or submit a pull request on the project's GitHub repository.
-
-## License
-
-The ADAM project is licensed under the MIT License. Please see the [LICENSE](LICENSE) file for more details.
-
-Feel free to update the sections and content as needed to reflect the specific details and structure of your ADAM project, including the integration with SUMO and Docker Compose.
+With this documentation, users can easily interact with the ADAM API and utilize its functionalities for their data-driven autonomous mobility projects.
