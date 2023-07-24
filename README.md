@@ -19,7 +19,7 @@ To run the ADAM project, follow these steps:
 
 1. Build the containers using the command: `docker-compose build`.
 2. Start the containers using: `docker-compose up`.
-3. Once the containers are up and running, you can access the API through Postman by navigating to [http://localhost:5000](http://localhost:5000/).
+3. Once the containers are up and running, you can access the API through Postman by navigating to [http://127.0.0.1:5000](http://127.0.0.1:5000/).
 
 ## Documentation
 
@@ -56,16 +56,16 @@ For ease of testing, the following endpoints are available in Postman:
 
 #### GET
 
-- [http://localhost:5000/cars](http://localhost:5000/cars): To get all the information about the vehicles on the road.
-- [http://localhost:5000/cars/list](http://localhost:5000/cars/list): To get the list of vehicles on the road (only the names of the vehicles).
-- [http://localhost:5000/cars/nameofvehicle](http://localhost:5000/cars/nameofvehicle): To get all the information about a specific vehicle.
+- [http://127.0.0.1:5000/cars](http://127.0.0.1:5000/cars): To get all the information about the vehicles on the road.
+- [http://127.0.0.1:5000/cars/list](http://127.0.0.1:5000/cars/list): To get the list of vehicles on the road (only the names of the vehicles).
+- [http://127.0.0.1:5000/cars/nameofvehicle](http://127.0.0.1:5000/cars/nameofvehicle): To get all the information about a specific vehicle.
 
 #### POST
 
-- [http://localhost:5000/cars/nameofvehicle/add](http://localhost:5000/cars/nameofvehicle/add): To add a new vehicle to the simulation.
+- [http://127.0.0.1:5000/cars/nameofvehicle/add](http://127.0.0.1:5000/cars/nameofvehicle/add): To add a new vehicle to the simulation.
 
 #### DELETE
 
-- [http://localhost:5000/cars/nameofvehicle/remove](http://localhost:5000/cars/nameofvehicle/remove): To remove a vehicle from the simulation.
+- [http://127.0.0.1:5000/cars/nameofvehicle/remove](http://127.0.0.1:5000/cars/nameofvehicle/remove): To remove a vehicle from the simulation.
 
 With this documentation, users can easily interact with the ADAM API and utilize its functionalities for their data-driven autonomous mobility projects.
