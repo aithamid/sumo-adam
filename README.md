@@ -86,9 +86,9 @@ The API is developed using Flask and provides the following endpoints:
 
 - **GET /cars**: Retrieves all information about the vehicles currently on the road.
 - **GET /cars/list**: Retrieves a list of vehicle names currently on the road.
-- **GET /cars/<vehicle>**: Retrieves detailed information about a specific vehicle.
-- **POST /cars/<vehicle>/add**: Adds a new vehicle to the simulation.
-- **DELETE /cars/<vehicle>/remove**: Removes a vehicle from the simulation.
+- **GET /cars/vehicle**: Retrieves detailed information about a specific vehicle.
+- **POST /cars/vehicle/add**: Adds a new vehicle to the simulation.
+- **DELETE /cars/vehicle/remove**: Removes a vehicle from the simulation.
 
 ### Postman
 
