@@ -21,6 +21,45 @@ To run the ADAM project, follow these steps:
 2. Start the containers using: `docker-compose up`.
 3. Once the containers are up and running, you can access the API through Postman by navigating to [http://127.0.0.1:5000](http://127.0.0.1:5000/).
 
+To run the ADAM project without using `docker-compose`, you can follow these steps:
+
+1. Build and run the InfluxDB container:
+
+```bash
+docker run -d -p 8086:8086 --name=influxdb \
+-e DOCKER_INFLUXDB_INIT_MODE=setup \
+-e DOCKER_INFLUXDB_INIT_ORG=ERENA \
+-e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=I5Iyui0V6B-MLOX9Hm_GlcvC7ZqJVTMDF04fqfFsgDQjniavDldsZ4jhtfBOKKwi1l4ACjBarQXvDEFrYYZ6CQ== \
+-e DOCKER_INFLUXDB_INIT_BUCKET=db \
+-e DOCKER_INFLUXDB_INIT_USERNAME=erena \
+-e DOCKER_INFLUXDB_INIT_PASSWORD=erena123 \
+-v ./influxdb:/var/lib/influxdb influxdb
+```
+
+2. Navigate to the `app` directory and run the Sumo program `main.py`:
+
+```bash
+cd app
+python3 main.py
+```
+
+3. Navigate to the `api` directory and run the Flask API `api.py`:
+
+```bash
+cd ../api
+python3 api.py
+```
+
+With these steps, you should have InfluxDB, Sumo, and the ADAM API running on your system. You can now access the API endpoints using Postman or any other HTTP client.
+
+Remember to install the required dependencies before running the `main.py` and `api.py` scripts by running the following command inside the respective directories:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+Make sure you have Python, Docker, and Sumo installed on your system before proceeding with these steps. Additionally, ensure that the necessary configurations are set up correctly, such as the database initialization parameters for InfluxDB and the API endpoints in the Flask application.
+
 ## Documentation
 
 ### Sumo
