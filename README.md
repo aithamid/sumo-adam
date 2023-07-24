@@ -64,14 +64,6 @@ Make sure you have Python, Docker, and Sumo installed on your system before proc
 
 ### Sumo
 
-The main program [`main.py`](http://main.py) orchestrates three essential classes:
-
-- `Launcher` from `launcher.py`: Responsible for launching Sumo simulation with a specified configuration delay.
-- `UpdateDB` from `updatedb.py`: Handles the updating of the InfluxDB with vehicle data at a configurable delay.
-- `Editor` from `editor.py`: Manages scenario editing, including adding and removing vehicles in the simulation at a configurable delay.
-
-Each function call within the program creates a thread to ensure efficient and concurrent execution.
-
 ```python
 def main():
     Launcher(200)  
@@ -79,6 +71,15 @@ def main():
     Editor(1000)
 ```
 
+In the `main()` function, three essential classes are instantiated: `Launcher`, `UpdateDB`, and `Editor`. Each class serves a specific purpose in orchestrating the Sumo simulation environment and managing data updates in the database.
+
+- `Launcher(200)`: The `Launcher` class is responsible for launching the Sumo simulation with a specified configuration delay of 200 milliseconds. This delay allows for a controlled interval between each update of the simulation, ensuring efficient simulation execution.
+
+- `UpdateDB(1000)`: The `UpdateDB` class handles the updating of the InfluxDB with vehicle data. The delay of 1000 milliseconds (1 second) indicates that the database will be refreshed every second with the most recent vehicle information. This ensures that the data available in the database remains up-to-date and reflects real-time vehicle movements in the simulation.
+
+- `Editor(1000)`: The `Editor` class manages scenario editing, including adding and removing vehicles in the simulation. With a delay of 1000 milliseconds (1 second), the editor continuously checks the database every second to determine if any modifications have been made to the simulation via the API. This enables real-time responsiveness to user interactions with the simulation, allowing them to make dynamic changes as needed.
+
+By incorporating these delay values, the ADAM project optimizes the simulation execution, database updates, and user interactions, ensuring smooth and concurrent operations.
 ### API
 
 The API is developed using Flask and provides the following endpoints:
