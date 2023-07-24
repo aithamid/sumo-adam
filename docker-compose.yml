@@ -3,7 +3,7 @@ services:
   sumo-app:
     build:
       context: .
-      dockerfile: Dockerfile.sumoapp
+      dockerfile: app/Dockerfile.sumoapp
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./sumo:/sumo
@@ -18,7 +18,7 @@ services:
   sumo-api:
     build:
       context: .
-      dockerfile: Dockerfile.sumoapi
+      dockerfile: api/Dockerfile.sumoapi
     ports:
       - "5000:5000"  # Replace with the desired port mapping
 
