@@ -28,7 +28,7 @@ class SumoAPI:
         values = result.to_values()
         values_list = [list(item) for item in values]
         if values_list:
-            tmp = values_list[0][8]
+            tmp = values_list[len(values_list)-1][8]
             self.list = ast.literal_eval(tmp)
             print(self.list)
         else:

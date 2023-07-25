@@ -12,8 +12,12 @@ class UpdateDB:
     def __init__(self, c_delay):
         self.i = None
         self.simu_id = 1
+        self.list = None
+        self.start_time = '1970-01-01T00:00:00Z'
+        self.end_time = '2099-12-31T23:59:59Z'
         with InfluxDBClient.from_config_file("creds.toml") as self.client:
             self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
+            self.delete_api = self.client.delete_api()
         self.delay = c_delay
         my_thread = threading.Thread(target=self.update)
         my_thread.start()
@@ -43,8 +47,13 @@ class UpdateDB:
         self.i += 1
 
     def insertvehicles(self):
-        data_point = Point("vehicles") \
-            .tag("vehlist", str(traci.vehicle.getIDList())) \
-            .field("test", 0) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
+        if self.list != traci.vehicle.getIDList():
+            self.delete_api.delete(start=self.start_time, stop=self.end_time,
+                                   predicate='_measurement="{}"'.format("vehicles"), bucket="db", org="ERENA")
+            data_point = Point("vehicles") \
+                .tag("vehlist", str(traci.vehicle.getIDList())) \
+                .field("test", 0) \
+                .time(datetime.utcnow())
+            self.write_api.write(bucket="db", record=data_point)
+            self.list = traci.vehicle.getIDList()
+            print(traci.vehicle.getIDList())

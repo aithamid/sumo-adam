@@ -21,7 +21,8 @@ services:
       dockerfile: api/Dockerfile.sumoapi
     ports:
       - "5000:5000"  # Replace with the desired port mapping
-
+    depends_on:
+      - sumo-app
 
   influxdb:
     image: influxdb

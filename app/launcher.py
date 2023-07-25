@@ -38,15 +38,3 @@ class Launcher:
         while traci.simulation.getMinExpectedNumber() > 0:
             traci.simulationStep()
         traci.close()
-
-    def update(self):
-        pass
-
-    def insert(self):
-        pass
-
-    def addVehicle(self, vehicle):
-        pass
-
-    def removeVehicle(self, vehicle):
-        pass
