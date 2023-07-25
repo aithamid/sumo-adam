@@ -22,9 +22,11 @@ class Launcher:
             self.write_api = self.client.write_api()
             self.delete_api = self.client.delete_api()
         self.delay = c_delay
+        self.port = 51845
         print("Simulation created")
         traci.start(
-            [
+            port=self.port,
+            cmd=[
                 sumoBinary,
                 '-c', '../sumo/sumo.cfg',
                 '--delay', str(self.delay),
