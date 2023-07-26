@@ -12,6 +12,10 @@ class SumoAPI:
         self.app = Flask(__name__)
         self.app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
         self.list = None
+        self.run = False
+        self.ip = None
+        self.port = None
+        self.delay = None
         with InfluxDBClient.from_config_file("creds.toml") as self.client:
             self.query_api = self.client.query_api()
             self.write_api = self.client.write_api()
@@ -28,7 +32,7 @@ class SumoAPI:
         values = result.to_values()
         values_list = [list(item) for item in values]
         if values_list:
-            tmp = values_list[len(values_list)-1][8]
+            tmp = values_list[len(values_list) - 1][8]
             self.list = ast.literal_eval(tmp)
             print(self.list)
         else:
@@ -105,9 +109,23 @@ class SumoAPI:
             .time(datetime.utcnow())
         self.write_api.write(bucket="db", record=data_point)
 
-    def get_cars_list(self):
-        pass
+    def start_simu(self):
+        data_point = Point("launcher") \
+            .field("state", "start") \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
 
+    def stop_simu(self):
+        data_point = Point("launcher") \
+            .field("state", "stop") \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
+    def connect_simu(self):
+        data_point = Point("launcher") \
+            .field("state", "connect") \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
 
 sumo_api = SumoAPI()
 
@@ -148,6 +166,48 @@ def remove_car(vehicle):
     else:
         sumo_api.remove_car(vehicle)
         return f"Car {vehicle} removed"
+
+
+@sumo_api.app.route('/simulation/start', methods=['POST'])
+def start_simu():
+    if sumo_api.run:
+        return jsonify({"message": "Simulation already launched."}), 400
+    sumo_api.ip = request.args.get('ip')
+    sumo_api.port = request.args.get('port')
+    sumo_api.delay = request.args.get('delay')
+
+    if not sumo_api.ip or not sumo_api.port or not sumo_api.delay:
+        return jsonify({"error": "IP, Port and Delay (in ms) parameters are required."}), 400
+    response = {
+        "message": f"Simulating start to IP: {sumo_api.ip}, Port: {sumo_api.port} with a delay of {sumo_api.delay}"}
+    sumo_api.run = True
+    sumo_api.start_simu()
+    return jsonify(response), 200
+
+
+@sumo_api.app.route('/simulation/connect', methods=['POST'])
+def connect_simu():
+    if sumo_api.run:
+        return jsonify({"message": "Simulation already launched."}), 400
+    sumo_api.ip = request.args.get('ip')
+    sumo_api.port = request.args.get('port')
+    if not sumo_api.ip or not sumo_api.port:
+        return jsonify({"error": "IP and Port parameters are required."}), 400
+    response = {
+        "message": f"Simulating connection to IP: {sumo_api.ip}, Port: {sumo_api.port}"}
+    sumo_api.run = True
+    sumo_api.connect_simu()
+    return jsonify(response), 200
+
+
+@sumo_api.app.route('/simulation/stop', methods=['POST'])
+def stop_simu():
+    if not sumo_api.run:
+        return jsonify({"message": "Simulation already stopped."}), 400
+    response = {"message": f"Simulation IP: {sumo_api.ip}, Port: {sumo_api.port} stopped"}
+    sumo_api.run = False
+    sumo_api.stop_simu()
+    return jsonify(response), 200
 
 
 if __name__ == '__main__':

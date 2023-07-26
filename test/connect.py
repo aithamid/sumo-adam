@@ -1,20 +1,15 @@
 import traci
 
-def main():
-    remote_host = 'localhost'
-    port = 51845  # Le port sur lequel SUMO écoute pour les connexions TraCI
+def connect_to_sumo():
+    try:
+        traci.init(port=8813)
+        traci.simulationStep()
 
-    # Se connecter au simulateur SUMO distant
-    traci.connect(host=remote_host)
+        # Your TraCI client 1 logic here
 
-    # Exemple d'utilisation de TraCI pour récupérer la position d'un véhicule
-    vehicle_id = 'veh1'
-    position = traci.vehicle.getPosition(vehicle_id)
-    print(f"Position du véhicule {vehicle_id} : {position}")
-
-    # Fermer la connexion TraCI
-    traci.close()
-
+        traci.close()
+    except Exception as e:
+        print(f"Error connecting to SUMO: {e}")
 
 if __name__ == "__main__":
-    main()
+    connect_to_sumo()

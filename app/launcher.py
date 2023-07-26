@@ -24,15 +24,16 @@ class Launcher:
         self.delay = c_delay
         self.port = 51845
         print("Simulation created")
-        traci.start(
-            port=self.port,
-            cmd=[
-                sumoBinary,
-                '-c', '../sumo/sumo.cfg',
-                '--delay', str(self.delay),
-                '--start'
-            ]
-        )
+        # traci.start(
+        #     port=self.port,
+        #     cmd=[
+        #         sumoBinary,
+        #         '-c', '../sumo/sumo.cfg',
+        #         '--delay', str(self.delay),
+        #         '--start','--num-clients','2'
+        #     ]
+        # )
+        traci.init(port=8813)
         my_thread = threading.Thread(target=self.start)
         my_thread.start()
 
