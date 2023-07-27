@@ -19,8 +19,8 @@ class UpdateDB:
             self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
             self.delete_api = self.client.delete_api()
         self.delay = c_delay
-        my_thread = threading.Thread(target=self.update)
-        my_thread.start()
+        self.thread = threading.Thread(target=self.update)
+        self.thread.start()
 
     def update(self):
         self.i = 1
@@ -28,7 +28,6 @@ class UpdateDB:
             self.insertDB()
             self.insertvehicles()
             time.sleep(self.delay / 1000)
-        traci.close()
 
     def insertDB(self):
         for vehId in traci.vehicle.getIDList():

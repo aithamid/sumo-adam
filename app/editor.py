@@ -37,7 +37,6 @@ class Editor:
             self.check_toadd()
             self.check_toremove()
             time.sleep(self.delay / 1000)
-        traci.close()
 
     def check_toremove(self):
         result = self.query_api.query(self.query.format("toremove"))

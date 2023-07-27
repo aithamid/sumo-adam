@@ -110,20 +110,26 @@ class SumoAPI:
         self.write_api.write(bucket="db", record=data_point)
 
     def start_simu(self):
+        data = {"port": self.port, "delay": self.delay}
         data_point = Point("launcher") \
             .field("state", "start") \
+            .field("data", str(data)) \
             .time(datetime.utcnow())
         self.write_api.write(bucket="db", record=data_point)
 
     def stop_simu(self):
+        data = None
         data_point = Point("launcher") \
             .field("state", "stop") \
+            .field("data", str(data)) \
             .time(datetime.utcnow())
         self.write_api.write(bucket="db", record=data_point)
 
     def connect_simu(self):
+        data = {"ip": self.ip, "port": self.port}
         data_point = Point("launcher") \
             .field("state", "connect") \
+            .field("data", str(data)) \
             .time(datetime.utcnow())
         self.write_api.write(bucket="db", record=data_point)
 
