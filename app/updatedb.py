@@ -13,6 +13,7 @@ class UpdateDB:
         self.i = None
         self.simu_id = 1
         self.list = None
+        self.run = True
         self.start_time = '1970-01-01T00:00:00Z'
         self.end_time = '2099-12-31T23:59:59Z'
         with InfluxDBClient.from_config_file("creds.toml") as self.client:
@@ -24,7 +25,7 @@ class UpdateDB:
 
     def update(self):
         self.i = 1
-        while traci.simulation.getMinExpectedNumber() > 0:
+        while self.run:
             self.insertDB()
             self.insertvehicles()
             time.sleep(self.delay / 1000)
@@ -56,3 +57,7 @@ class UpdateDB:
             self.write_api.write(bucket="db", record=data_point)
             self.list = traci.vehicle.getIDList()
             print(traci.vehicle.getIDList())
+
+    def stop(self):
+        self.run = False
+        self.thread.join()

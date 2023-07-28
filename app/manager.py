@@ -7,52 +7,73 @@ from influxdb_client import InfluxDBClient
 from sumolib import checkBinary
 import json
 
+from app.editor import Editor
 from app.launcher import Launcher
+from app.updatedb import UpdateDB
+
 
 class Manager:
     def __init__(self):
+        self.delete_api = None
+        self.query_api = None
+        self.write_api = None
         self.state = None
         self.data = None
         self.run = False
-        with InfluxDBClient.from_config_file("creds.toml") as self.client:
-            self.query_api = self.client.query_api()
-            self.write_api = self.client.write_api()
-            self.delete_api = self.client.delete_api()
-        self.start_time = '1970-01-01T00:00:00Z'
-        self.end_time = '2099-12-31T23:59:59Z'
-        self.port = 51845
+        self.launcher = None
+        self.updatedb = None
+        self.editor = None
+        self.influxdb()
+        self.reset_database("sumo")
+        self.reset_database("vehicles")
         print("API Launched")
-        self.thread = threading.Thread(target=self.start)
+        self.thread = threading.Thread(target=self.loop)
         self.thread.start()
 
-    def start(self):
-        self.reset_database()
-        launcher = None
+    def loop(self):
+        self.reset_database("launcher")
         while True:
-            if self.get_last_state():
-                if not self.run and self.state == "start":
-                    print("enter")
-                    self.run = True
-                    launcher = Launcher(state=self.state, delay=self.data["delay"], port=int(self.data["port"]))
-                    print(self.state)
-                    print(self.data)
-                elif not self.run and self.state == "connect":
-                    self.run = True
-                    launcher = Launcher(state=self.state, ip=self.data["ip"], port=int(self.data["port"]))
-                    if launcher.error:
-                        print("failed")
-                    print(self.state)
-                    print(self.data)
-                elif self.run and self.state == "stop":
-                    self.run = False
-                    launcher.stop()
-                    launcher.thread.join()
-                    launcher = None
-                    print(self.state)
-                    print(self.data)
+            self.manager()
 
+    def manager(self):
+        if self.get_last_state():
+            if not self.run and self.state == "start":
+                self.start_simulation()
+            elif not self.run and self.state == "connect":
+                self.connect_simulation()
+            elif self.run and self.state == "stop":
+                self.stop_simulation()
+            time.sleep(1)
 
-                time.sleep(1)
+    def start_simulation(self):
+        print("enter")
+        self.run = True
+        self.launcher = Launcher(state=self.state, delay=self.data["delay"], port=int(self.data["port"]))
+        self.updatedb = UpdateDB(1000)
+        self.editor = Editor(1000)
+        print(self.state)
+        print(self.data)
+
+    def connect_simulation(self):
+        self.run = True
+        self.launcher = Launcher(state=self.state, ip=self.data["ip"], port=int(self.data["port"]))
+        self.updatedb = UpdateDB(1000)
+        self.editor = Editor(1000)
+        if self.launcher.error:
+            print("failed")
+        print(self.state)
+        print(self.data)
+
+    def stop_simulation(self):
+        self.run = False
+        self.editor.stop()
+        self.updatedb.stop()
+        self.launcher.stop()
+        self.launcher.thread.join()
+        launcher = None
+        print(self.state)
+        print(self.data)
+
     def get_last_state(self):
         result = self.query_api.query("""
           from(bucket: "db")
@@ -74,9 +95,18 @@ class Manager:
             self.data = None
             return False
 
-    def reset_database(self):
+    def reset_database(self, measurement):
+        self.start_time = '1970-01-01T00:00:00Z'
+        self.end_time = '2099-12-31T23:59:59Z'
         self.delete_api.delete(start=self.start_time, stop=self.end_time,
-                               predicate='_measurement="{}"'.format("launcher"), bucket="db", org="ERENA")
+                               predicate='_measurement="{}"'.format(measurement), bucket="db", org="ERENA")
+
+    def influxdb(self):
+        with InfluxDBClient.from_config_file("creds.toml") as self.client:
+            self.query_api = self.client.query_api()
+            self.write_api = self.client.write_api()
+            self.delete_api = self.client.delete_api()
+
 
 if __name__ == "__main__":
     Manager()

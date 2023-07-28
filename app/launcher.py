@@ -22,43 +22,43 @@ class Launcher:
         if state == "connect":
             self.ip = ip
             self.port = port
-            self.thread = threading.Thread(target=self.connect)
-            self.thread.start()
+            try:
+                traci.init(port=int(self.port), host=self.ip, numRetries=0)
+                self.thread = threading.Thread(target=self.connect)
+                self.thread.start()
+            except traci.FatalTraCIError as e:
+                print(f"Error occurred during TraCI communication: {e}")
+                self.error = True
+            except Exception as e:
+                print(f"Unexpected error occurred: {e}")
+                self.error = True
         elif state == "start":
             self.port = port
             self.delay = delay
+            traci.start(
+                port=self.port,
+                cmd=[
+                    sumoBinary,
+                    '-c', '../sumo/sumo.cfg',
+                    '--delay', str(self.delay),
+                    '--start'
+                ]
+            )
             self.thread = threading.Thread(target=self.start)
             self.thread.start()
         elif state == "stop":
             self.stop()
 
     def start(self):
-        traci.start(
-            port=self.port,
-            cmd=[
-                sumoBinary,
-                '-c', '../sumo/sumo.cfg',
-                '--delay', str(self.delay),
-                '--start'
-            ]
-        )
         while self.running_flag:
-            # Your simulation steps here
             traci.simulationStep()
         traci.close()
 
     def connect(self):
-        try:
-            traci.init(port=int(self.port), host=self.ip, numRetries=0)
-            while self.running_flag:
-                traci.simulationStep()
-            traci.close()
-        except traci.FatalTraCIError as e:
-            print(f"Error occurred during TraCI communication: {e}")
-            self.error = True
-        except Exception as e:
-            print(f"Unexpected error occurred: {e}")
-            self.error = True
+        while self.running_flag:
+            traci.simulationStep()
+        traci.close()
+
 
     def stop(self):
         self.running_flag = False

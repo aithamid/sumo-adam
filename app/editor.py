@@ -12,6 +12,7 @@ class Editor:
         self.toadd = None
         self.start_time = '1970-01-01T00:00:00Z'
         self.end_time = '2099-12-31T23:59:59Z'
+        self.run = True
         self.query = """from(bucket: "db")
         |> range(start: 0)
         |> filter(fn: (r) => r["_measurement"] == "{}")
@@ -29,11 +30,11 @@ class Editor:
         self.delete_api.delete(start=self.start_time, stop=self.end_time,
                                predicate='_measurement="{}"'.format("toremove"), bucket="db", org="ERENA")
 
-        my_thread = threading.Thread(target=self.loop)
-        my_thread.start()
+        self.thread = threading.Thread(target=self.loop)
+        self.thread.start()
 
     def loop(self):
-        while traci.simulation.getMinExpectedNumber() > 0:
+        while self.run and traci.simulation.getMinExpectedNumber() > 0:
             self.check_toadd()
             self.check_toremove()
             time.sleep(self.delay / 1000)
@@ -70,3 +71,6 @@ class Editor:
                     traci.vehicle.remove(vehID=record['_value'])
         self.delete_api.delete(start=self.start_time, stop=self.end_time, predicate='_measurement="{}"'.format(measurement), bucket="db", org="ERENA")
 
+    def stop(self):
+        self.run = False
+        self.thread.join()
