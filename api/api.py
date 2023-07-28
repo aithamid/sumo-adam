@@ -21,6 +21,7 @@ class SumoAPI:
             self.write_api = self.client.write_api()
 
     def get_list_cars(self):
+        """This method return a tuple of cars that are in activity."""
         result = self.query_api.query("""
         from(bucket: "db")
               |> range(start: 0)
@@ -39,7 +40,79 @@ class SumoAPI:
             print("No data available.")
         return tmp
 
+    def get_car_manager(self, query):
+        """This method will take a "query" as parameter
+            Return a json."""
+        if query == -1:
+            return """There is no car in activity"""
+        elif query == -2:
+            return """This car is not car in activity"""
+        else:
+            result = self.query_api.query(query)
+            myjson = result.to_json()
+            return myjson
+
+    def get_all_cars(self):
+        """This method will return information for all the cars that are active
+                                        """
+        return self.get_car_manager(self.query_builder())
+
+    def get_car(self, vehicle):
+        """This method will return information about a car in JSON format
+                                        """
+        return self.get_car_manager(self.query_builder(vehicle))
+
+    def add_car(self, vehicle):
+        """This method will send to the database that the user want to add a car
+                                        """
+        data_point = Point("toadd") \
+            .field("vehicle_id", vehicle) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
+    def remove_car(self, vehicle):
+        """This method will send to the database that the user want to remove a car
+                                """
+        data_point = Point("toremove") \
+            .field("vehicle_id", vehicle) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
+    def start_simu(self):
+        """This method will send to the database that the user want to start a new simulation
+                        """
+        data = {"port": self.port, "delay": self.delay}
+        data_point = Point("launcher") \
+            .field("state", "start") \
+            .field("data", str(data)) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
+    def stop_simu(self):
+        """This method will send to the database that the user want to stop simulation
+                        """
+        data = None
+        data_point = Point("launcher") \
+            .field("state", "stop") \
+            .field("data", str(data)) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
+    def connect_simu(self):
+        """This method will send to the database that the user want to connect to an existing simulation
+                """
+        data = {"ip": self.ip, "port": self.port}
+        data_point = Point("launcher") \
+            .field("state", "connect") \
+            .field("data", str(data)) \
+            .time(datetime.utcnow())
+        self.write_api.write(bucket="db", record=data_point)
+
     def query_builder(self, vehicle=None):
+        """This method build queries for influx database,
+                if you add the "vehicle" parameter it builds a query to get info about a specific vehicle.
+                if you don't, it returns a query to get all the information about all vehicles
+        """
         self.get_list_cars()
         condition = ""
         vehicle_condition = ""
@@ -81,57 +154,6 @@ class SumoAPI:
             """
         return query
 
-    def get_car_manager(self, query):
-        if query == -1:
-            return """There is no car in activity"""
-        elif query == -2:
-            return """This car is not car in activity"""
-        else:
-            result = self.query_api.query(query)
-            myjson = result.to_json()
-            return myjson
-
-    def get_all_cars(self):
-        return self.get_car_manager(self.query_builder())
-
-    def get_car(self, vehicle):
-        return self.get_car_manager(self.query_builder(vehicle))
-
-    def add_car(self, vehicle):
-        data_point = Point("toadd") \
-            .field("vehicle_id", vehicle) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
-
-    def remove_car(self, vehicle):
-        data_point = Point("toremove") \
-            .field("vehicle_id", vehicle) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
-
-    def start_simu(self):
-        data = {"port": self.port, "delay": self.delay}
-        data_point = Point("launcher") \
-            .field("state", "start") \
-            .field("data", str(data)) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
-
-    def stop_simu(self):
-        data = None
-        data_point = Point("launcher") \
-            .field("state", "stop") \
-            .field("data", str(data)) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
-
-    def connect_simu(self):
-        data = {"ip": self.ip, "port": self.port}
-        data_point = Point("launcher") \
-            .field("state", "connect") \
-            .field("data", str(data)) \
-            .time(datetime.utcnow())
-        self.write_api.write(bucket="db", record=data_point)
 
 sumo_api = SumoAPI()
 
