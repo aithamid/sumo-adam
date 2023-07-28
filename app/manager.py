@@ -30,18 +30,28 @@ class Manager:
         launcher = None
         while True:
             if self.get_last_state():
-                if not self.run and self.state == "connect":
-                    launcher = Launcher(state="connect", ip=self.data["ip"], port=self.data["port"])
+                if not self.run and self.state == "start":
+                    print("enter")
                     self.run = True
-                elif not self.run and self.state == "start":
-                    launcher = Launcher(state="connect", delay=self.data["delay"], port=self.data["port"])
+                    launcher = Launcher(state=self.state, delay=self.data["delay"], port=int(self.data["port"]))
+                    print(self.state)
+                    print(self.data)
+                elif not self.run and self.state == "connect":
                     self.run = True
+                    launcher = Launcher(state=self.state, ip=self.data["ip"], port=int(self.data["port"]))
+                    if launcher.error:
+                        print("failed")
+                    print(self.state)
+                    print(self.data)
                 elif self.run and self.state == "stop":
                     self.run = False
                     launcher.stop()
+                    launcher.thread.join()
+                    launcher = None
+                    print(self.state)
+                    print(self.data)
 
-                print(self.state)
-                print(self.data)
+
                 time.sleep(1)
     def get_last_state(self):
         result = self.query_api.query("""
@@ -63,8 +73,6 @@ class Manager:
             self.state = None
             self.data = None
             return False
-    #
-    # def event_manager(self):
 
     def reset_database(self):
         self.delete_api.delete(start=self.start_time, stop=self.end_time,
