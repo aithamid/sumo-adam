@@ -46,8 +46,8 @@ python3 main.py
 3. Navigate to the `api` directory and run the Flask API `api.py`:
 
 ```bash
-cd ../api
-python3 api.py
+cd ../api-1.0
+python3 api-1.0.py
 ```
 
 With these steps, you should have InfluxDB, Sumo, and the ADAM API running on your system. You can now access the API endpoints using Postman or any other HTTP client.

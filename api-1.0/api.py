@@ -200,11 +200,10 @@ def remove_car(vehicle):
 def start_simu():
     if sumo_api.run:
         return jsonify({"message": "Simulation already launched."}), 400
-    sumo_api.ip = request.args.get('ip')
     sumo_api.port = request.args.get('port')
     sumo_api.delay = request.args.get('delay')
 
-    if not sumo_api.ip or not sumo_api.port or not sumo_api.delay:
+    if not sumo_api.port or not sumo_api.delay:
         return jsonify({"error": "IP, Port and Delay (in ms) parameters are required."}), 400
     response = {
         "message": f"Simulating start to IP: {sumo_api.ip}, Port: {sumo_api.port} with a delay of {sumo_api.delay}"}
