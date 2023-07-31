@@ -19,8 +19,3 @@ def create_api():
 
     return api
 
-
-api = create_api()
-
-if __name__ == '__main__':
-    api.run()
