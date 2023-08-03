@@ -39,7 +39,7 @@ docker run -d -p 8086:8086 --name=influxdb \
 2. Navigate to the `app` directory and run the Sumo program `main.py`:
 
 ```bash
-cd app
+cd core
 python3 main.py
 ```
 

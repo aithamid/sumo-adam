@@ -7,9 +7,9 @@ from influxdb_client import InfluxDBClient
 from sumolib import checkBinary
 import json
 
-from app.editor import Editor
-from app.launcher import Launcher
-from app.updatedb import UpdateDB
+from core.editor import Editor
+from core.launcher import Launcher
+from core.updatedb import UpdateDB
 
 
 class Manager:

@@ -42,7 +42,7 @@ class Editor:
         This method will connect to the influx database thanks to creds.toml and gonna prepare API for get, write and remove data.
         :return:
         """
-        with InfluxDBClient.from_config_file("../app/creds.toml") as self.client:
+        with InfluxDBClient.from_config_file("../core/creds.toml") as self.client:
             self.query_api = self.client.query_api()
             self.write_api = self.client.write_api()
             self.delete_api = self.client.delete_api()
