@@ -60,7 +60,7 @@ Make sure you have Python, Docker, and Sumo installed on your system before proc
 
 ## Documentation
 
-### Sumo
+### Core
 
 ```python
 def start_simulation(self):
