@@ -13,7 +13,7 @@ from core.updatedb import UpdateDB
 
 
 class Manager:
-    def __init__(self):
+    def __init__(self, editor_delay, updatedb_delay):
         self.delete_api = None
         self.query_api = None
         self.write_api = None
@@ -23,6 +23,8 @@ class Manager:
         self.launcher = None
         self.updatedb = None
         self.editor = None
+        self.editor_delay = editor_delay
+        self.updatedb_delay = updatedb_delay
         self.influxdb()
         self.reset_database("sumo")
         self.reset_database("vehicles")
@@ -49,16 +51,16 @@ class Manager:
         print("enter")
         self.run = True
         self.launcher = Launcher(state=self.state, delay=self.data["delay"], port=int(self.data["port"]))
-        self.updatedb = UpdateDB(1000)
-        self.editor = Editor(1000)
+        self.updatedb = UpdateDB(self.updatedb_delay)
+        self.editor = Editor(self.editor_delay)
         print(self.state)
         print(self.data)
 
     def connect_simulation(self):
         self.run = True
         self.launcher = Launcher(state=self.state, ip=self.data["ip"], port=int(self.data["port"]))
-        self.updatedb = UpdateDB(1000)
-        self.editor = Editor(1000)
+        self.updatedb = UpdateDB(self.updatedb_delay)
+        self.editor = Editor(self.editor_delay)
         if self.launcher.error:
             print("failed")
         print(self.state)
@@ -108,5 +110,3 @@ class Manager:
             self.delete_api = self.client.delete_api()
 
 
-if __name__ == "__main__":
-    Manager()
