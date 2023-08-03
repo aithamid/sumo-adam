@@ -36,23 +36,21 @@ docker run -d -p 8086:8086 --name=influxdb \
 -v ./influxdb:/var/lib/influxdb influxdb
 ```
 
-2. Navigate to the `app` directory and run the Sumo program `main.py`:
+2. Run the Sumo program `main.py`:
 
 ```bash
-cd core
-python3 main.py
+python3 core.py
 ```
 
-3. Navigate to the `api` directory and run the Flask API `api.py`:
+3. Run the Flask API `api.py`:
 
 ```bash
-cd ../api-1.0
-python3 api-1.0.py
+python3 api.py
 ```
 
 With these steps, you should have InfluxDB, Sumo, and the ADAM API running on your system. You can now access the API endpoints using Postman or any other HTTP client.
 
-Remember to install the required dependencies before running the `main.py` and `api.py` scripts by running the following command inside the respective directories:
+Remember to install the required dependencies before running the `core.py` and `api.py` scripts by running the following command inside the respective directories:
 
 ```bash
 pip3 install -r requirements.txt
@@ -65,19 +63,21 @@ Make sure you have Python, Docker, and Sumo installed on your system before proc
 ### Sumo
 
 ```python
-def main():
-    Launcher(200)  
-    UpdateDB(1000) 
-    Editor(1000)
+def start_simulation(self):
+        print("enter")
+        self.run = True
+        self.launcher = Launcher(state=self.state, delay=self.data["delay"], port=int(self.data["port"]))
+        self.updatedb = UpdateDB(self.updatedb_delay)
+        self.editor = Editor(self.editor_delay)
 ```
 
-In the `main()` function, three essential classes are instantiated: `Launcher`, `UpdateDB`, and `Editor`. Each class serves a specific purpose in orchestrating the Sumo simulation environment and managing data updates in the database.
+In the `Manager` class, three essential classes are instantiated: `Launcher`, `UpdateDB`, and `Editor`. Each class serves a specific purpose in orchestrating the Sumo simulation environment and managing data updates in the database.
 
-- `Launcher(200)`: The `Launcher` class is responsible for launching the Sumo simulation with a specified configuration delay of 200 milliseconds. This delay allows for a controlled interval between each update of the simulation, ensuring efficient simulation execution.
+- `Launcher()`: The `Launcher` class is responsible for launching the Sumo simulation with a specified configuration. 
 
-- `UpdateDB(1000)`: The `UpdateDB` class handles the updating of the InfluxDB with vehicle data. The delay of 1000 milliseconds (1 second) indicates that the database will be refreshed every second with the most recent vehicle information. This ensures that the data available in the database remains up-to-date and reflects real-time vehicle movements in the simulation.
+- `UpdateDB(delay)`: The `UpdateDB` class handles the updating of the InfluxDB with vehicle data. The delay of 1000 milliseconds (1 second) indicates that the database will be refreshed every second with the most recent vehicle information. This ensures that the data available in the database remains up-to-date and reflects real-time vehicle movements in the simulation.
 
-- `Editor(1000)`: The `Editor` class manages scenario editing, including adding and removing vehicles in the simulation. With a delay of 1000 milliseconds (1 second), the editor continuously checks the database every second to determine if any modifications have been made to the simulation via the API. This enables real-time responsiveness to user interactions with the simulation, allowing them to make dynamic changes as needed.
+- `Editor(delay)`: The `Editor` class manages scenario editing, including adding and removing vehicles in the simulation. With a delay of 1000 milliseconds (1 second), the editor continuously checks the database every second to determine if any modifications have been made to the simulation via the API. This enables real-time responsiveness to user interactions with the simulation, allowing them to make dynamic changes as needed.
 
 By incorporating these delay values, the ADAM project optimizes the simulation execution, database updates, and user interactions, ensuring smooth and concurrent operations.
 ### API
@@ -103,6 +103,9 @@ For ease of testing, the following endpoints are available in Postman:
 #### POST
 
 - [http://127.0.0.1:5000/cars/nameofvehicle/add](http://127.0.0.1:5000/cars/nameofvehicle/add): To add a new vehicle to the simulation.
+- http://localhost:5000/simulation/start?port=8080&delay=200: To start a new simulation.
+- http://localhost:5000/simulation/connect?ip=localhost&port=8813: To connect to an existing simulation.
+- http://localhost:5000/simulation/stop: To stop the current simulation.
 
 #### DELETE
 
