@@ -9,19 +9,13 @@ The primary objective of this project is to create a REST API that facilitates d
 The ADAM project consists of four main components:
 
 1. **InfluxDB Container**: This container houses the database where vehicle data is stored.
-2. **Sumo Container**: This container manages the Sumo simulation environment, which includes tasks like launching Sumo, editing scenarios by adding or removing vehicles, and updating the database with relevant information.
-3. **API Container**: The core of ADAM, this container hosts the REST API developed using Flask. It enables users to interact with the data and perform various operations.
+2. **Core**: It manages the Sumo simulation environment, which includes tasks like launching Sumo, editing scenarios by adding or removing vehicles, and updating the database with relevant information.
+3. **API**: It hosts the REST API developed using Flask. It enables users to interact with the data and perform various operations.
 4. **Client**: The client interacts with the API, and for this purpose, Postman is used to facilitate testing and validation.
 
 ## Running the Project
 
 To run the ADAM project, follow these steps:
-
-1. Build the containers using the command: `docker-compose build`.
-2. Start the containers using: `docker-compose up`.
-3. Once the containers are up and running, you can access the API through Postman by navigating to [http://localhost:5000](http://localhost:5000/).
-
-To run the ADAM project without using `docker-compose`, you can follow these steps:
 
 1. Build and run the InfluxDB container:
 
@@ -36,7 +30,7 @@ docker run -d -p 8086:8086 --name=influxdb \
 -v ./influxdb:/var/lib/influxdb influxdb
 ```
 
-2. Run the Sumo program `main.py`:
+2. Run the Sumo program `core.py`:
 
 ```bash
 python3 core.py
@@ -48,7 +42,7 @@ python3 core.py
 python3 api.py
 ```
 
-With these steps, you should have InfluxDB, Sumo, and the ADAM API running on your system. You can now access the API endpoints using Postman or any other HTTP client.
+With these steps, you should have InfluxDB, CORE, and the ADAM API running on your system. You can now access the API endpoints using Postman or any other HTTP client.
 
 Remember to install the required dependencies before running the `core.py` and `api.py` scripts by running the following command inside the respective directories:
 
