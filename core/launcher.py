@@ -39,7 +39,7 @@ class Launcher:
                 port=self.port,
                 cmd=[
                     sumoBinary,
-                    '-c', '../sumo/sumo.cfg',
+                    '-c', 'sumo/sumo.cfg',
                     '--delay', str(self.delay),
                     '--start'
                 ]
