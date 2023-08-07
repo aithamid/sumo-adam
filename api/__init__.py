@@ -13,6 +13,7 @@ def create_api():
     from api.routes.edits import edits_bp
     from api.routes.launchs import launchs_bp
 
+    # Each blueprint is a layer of service
     api.register_blueprint(cars_bp)
     api.register_blueprint(edits_bp)
     api.register_blueprint(launchs_bp)

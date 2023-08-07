@@ -7,6 +7,9 @@ launch_service = LaunchService()
 
 @launchs_bp.route('/simulation/start', methods=['POST'])
 def start_simu():
+    """
+        This function will start a new sumo simulation
+        """
     if launch_service.run:
         return jsonify({"message": "Simulation already launched."}), 400
     launch_service.port = request.args.get('port')
@@ -23,6 +26,9 @@ def start_simu():
 
 @launchs_bp.route('/simulation/connect', methods=['POST'])
 def connect_simu():
+    """
+    This function will connect the program to the sumo simulation
+    """
     if launch_service.run:
         return jsonify({"message": "Simulation already launched."}), 400
     launch_service.ip = request.args.get('ip')
@@ -38,6 +44,9 @@ def connect_simu():
 
 @launchs_bp.route('/simulation/stop', methods=['POST'])
 def stop_simu():
+    """
+        This function will stop the running sumo simulation
+        """
     if not launch_service.run:
         return jsonify({"message": "Simulation already stopped."}), 400
     response = {"message": f"Simulation IP: {launch_service.ip}, Port: {launch_service.port} stopped"}
